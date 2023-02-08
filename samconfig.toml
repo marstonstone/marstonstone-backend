@@ -1,0 +1,30 @@
+version = 1.0
+
+[develop]
+[develop.global.parameters]
+stack_name = "backend-services-dev"
+region = "ap-southeast-2"
+parameter_overrides = [
+  "DeployEnvironment=dev"
+]
+[develop.deploy.parameters]
+s3_bucket = "marstonstone-backend-services-dev"
+confirm_changeset = false
+fail_on_empty_changeset = false
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+
+
+[production]
+[production.global.parameters]
+stack_name = "backend-services-prod"
+parameter_overrides = [
+  "DeployEnvironment=prod"
+]
+region = "ap-southeast-2"
+[production.deploy.parameters]
+s3_bucket = "marstonstone-backend-services-prod"
+confirm_changeset = false
+fail_on_empty_changeset = false
+capabilities = "CAPABILITY_IAM"
+image_repositories = []

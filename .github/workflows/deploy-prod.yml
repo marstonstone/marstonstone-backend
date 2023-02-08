@@ -1,0 +1,43 @@
+name: SAM Deploy to Production
+on:
+  push:
+    branches:
+      - master
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  BuildTestDeploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - name: Git clone repository
+        uses: actions/checkout@v3
+
+      - name: Set up node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up aws sam
+        uses: aws-actions/setup-sam@v2
+
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.SAM_DEPLOYMENT_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Sam build for production
+        run: sam build --config-env production
+
+      # - name: Run unit tests
+      #   run: npm run test
+
+      - name: Sam deploy for production
+        run: sam deploy --config-env production

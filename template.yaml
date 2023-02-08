@@ -1,9 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  marstonstone-backend
-
-  Sample SAM Template for marstonstone-backend
+  Marstonstone Backend Services managed by AWS SAM
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -17,11 +15,20 @@ Globals:
       AllowOrigin: "'*'"
       AllowHeaders: "'*'"
 
+Parameters:
+  DeployEnvironment:
+    Type: String
+    Description: 'Environment of deployment (dev/prod)'
+
 Resources:
+  # Lambda Functions
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: hello-world/
+      FunctionName: !Sub
+        - 'HelloWorld-${env}'
+        - env: !Ref DeployEnvironment
+      CodeUri: src/functions/hello-world/
       Handler: index.handler
       Events:
         HelloWorld:
@@ -30,16 +37,28 @@ Resources:
             Path: /hello
             Method: get
 
-Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: 'API Gateway endpoint URL for Prod stage for Hello World function'
-    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/'
-  HelloWorldFunction:
-    Description: 'Hello World Lambda Function ARN'
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: 'Implicit IAM Role created for Hello World function'
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  # # APIs
+  # InternalAPI:
+  #   Type: AWS::Serverless::Api
+  #   Properties:
+  #     StageName: !Ref DeployEnvironment
+  # Auth:
+  #   # DefaultAuthorizer: CognitoAuthorizer
+  #   Authorizers:
+  #     CognitoAuthorizer:
+  #       UserPoolArn: !Sub
+  #         - 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPoolId}'
+  #         - UserPoolId: !FindInMap [Cognito, UserPoolId, !Ref DeployEnvironment]
+# Outputs:
+#   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+#   # Find out more about other implicit resources you can reference within SAM
+#   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+#   HelloWorldApi:
+#     Description: 'API Gateway endpoint URL for Prod stage for Hello World function'
+#     Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/'
+#   HelloWorldFunction:
+#     Description: 'Hello World Lambda Function ARN'
+#     Value: !GetAtt HelloWorldFunction.Arn
+#   HelloWorldFunctionIamRole:
+#     Description: 'Implicit IAM Role created for Hello World function'
+#     Value: !GetAtt HelloWorldFunctionRole.Arn
