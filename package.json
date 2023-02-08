@@ -1,0 +1,16 @@
+{
+  "name": "marstonstone-backend",
+  "version": "1.0.0",
+  "description": "Marstonstone Backend Services",
+  "license": "MIT",
+  "scripts": {
+    "test": "mocha --timeout 30000"
+  },
+  "mocha": {
+    "spec": "**/*.test.js"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^9.1.4"
+  }
+}
