@@ -15,12 +15,17 @@ Globals:
       AllowOrigin: "'*'"
       AllowHeaders: "'*'"
 
+Parameters:
+  DeployEnvironment:
+    Type: String
+    Description: 'Environment of deployment (dev/prod)'
+
 Resources:
   # Lambda Functions
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: hello-world/
+      CodeUri: src/functions/hello-world/
       Handler: index.handler
       # Events:
       #   HelloWorld:
@@ -30,17 +35,17 @@ Resources:
       #       Method: get
 
   # APIs
-  InternalAPI:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: !Ref DeployEnvironment
-      # Auth:
-      #   # DefaultAuthorizer: CognitoAuthorizer
-      #   Authorizers:
-      #     CognitoAuthorizer:
-      #       UserPoolArn: !Sub
-      #         - 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPoolId}'
-      #         - UserPoolId: !FindInMap [Cognito, UserPoolId, !Ref DeployEnvironment]
+  # InternalAPI:
+  #   Type: AWS::Serverless::Api
+  #   Properties:
+  #     StageName: !Ref DeployEnvironment
+  # Auth:
+  #   # DefaultAuthorizer: CognitoAuthorizer
+  #   Authorizers:
+  #     CognitoAuthorizer:
+  #       UserPoolArn: !Sub
+  #         - 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPoolId}'
+  #         - UserPoolId: !FindInMap [Cognito, UserPoolId, !Ref DeployEnvironment]
 # Outputs:
 #   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
 #   # Find out more about other implicit resources you can reference within SAM
