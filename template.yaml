@@ -29,6 +29,9 @@ Resources:
         - env: !Ref DeployEnvironment
       CodeUri: src/functions/hello-world/
       Handler: index.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrderTable
       Events:
         HelloWorld:
           Type: Api
@@ -50,6 +53,134 @@ Resources:
   #         - UserPoolId: !FindInMap [Cognito, UserPoolId, !Ref DeployEnvironment]
 
   # DynamoDB Tables
+  BuilderTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub
+        - 'builder-${env}'
+        - env: !Ref DeployEnvironment
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 10
+        WriteCapacityUnits: 10
+
+  CustomerTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub
+        - 'customer-${env}'
+        - env: !Ref DeployEnvironment
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: builder
+          AttributeType: S
+        - AttributeName: staff
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 10
+        WriteCapacityUnits: 10
+      GlobalSecondaryIndexes:
+        - IndexName: builder-staff
+          KeySchema:
+            - AttributeName: builder
+              KeyType: HASH
+            - AttributeName: staff
+              KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: 10
+            WriteCapacityUnits: 10
+
+  OrderTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub
+        - 'order-${env}'
+        - env: !Ref DeployEnvironment
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: builder
+          AttributeType: S
+        - AttributeName: staff
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 10
+        WriteCapacityUnits: 10
+      GlobalSecondaryIndexes:
+        - IndexName: builder-staff
+          KeySchema:
+            - AttributeName: builder
+              KeyType: HASH
+            - AttributeName: staff
+              KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: 10
+            WriteCapacityUnits: 10
+
+  SupplierTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub
+        - 'supplier-${env}'
+        - env: !Ref DeployEnvironment
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 10
+        WriteCapacityUnits: 10
+
+  MaterialTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub
+        - 'material-${env}'
+        - env: !Ref DeployEnvironment
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: supplier
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 10
+        WriteCapacityUnits: 10
+      GlobalSecondaryIndexes:
+        - IndexName: builder-staff
+          KeySchema:
+            - AttributeName: supplier
+              KeyType: HASH
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: 10
+            WriteCapacityUnits: 10
 
   # Cognito User Pools
   StaffUserPool:
@@ -83,9 +214,26 @@ Outputs:
   # HelloWorldApi:
   #   Description: 'API Gateway endpoint URL for Prod stage for Hello World function'
   #   Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/'
-  # HelloWorldFunction:
-  #   Description: 'Hello World Lambda Function ARN'
-  #   Value: !GetAtt HelloWorldFunction.Arn
+  BuilderTable:
+    Description: 'DynamoDB Builder Table'
+    Value: !Ref BuilderTable
+
+  CustomerTable:
+    Description: 'DynamoDB Customer Table'
+    Value: !Ref CustomerTable
+
+  OrderTable:
+    Description: 'DynamoDB Order Table'
+    Value: !Ref OrderTable
+
+  SupplierTable:
+    Description: 'DynamoDB Supplier Table'
+    Value: !Ref SupplierTable
+
+  MaterialTable:
+    Description: 'DynamoDB Material Table'
+    Value: !Ref MaterialTable
+
   StaffUserPool:
     Description: 'Staff UserPool Id'
     Value: !Ref StaffUserPool
