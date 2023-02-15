@@ -21,36 +21,56 @@ Parameters:
 
 Resources:
   # Lambda Functions
-  HelloWorldFunction:
+  SupplierFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub
-        - 'HelloWorld-${env}'
+        - 'Supplier-${env}'
         - env: !Ref DeployEnvironment
-      CodeUri: src/functions/hello-world/
+      CodeUri: src/functions/supplier/
       Handler: index.handler
+      Environment:
+        Variables:
+          TableName: !Ref SupplierTable
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref OrderTable
+            TableName: !Ref SupplierTable
       Events:
-        HelloWorld:
+        GetAllSuppliers:
           Type: Api
           Properties:
-            Path: /hello
+            RestApiId: !Ref InternalAPI
+            Path: /suppliers
             Method: get
+        PostSupplier:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /suppliers
+            Method: post
+        PutSupplier:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /suppliers
+            Method: put
+        DeleteSupplier:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /suppliers
+            Method: delete
 
-  # # APIs
-  # InternalAPI:
-  #   Type: AWS::Serverless::Api
-  #   Properties:
-  #     StageName: !Ref DeployEnvironment
-  # Auth:
-  #   # DefaultAuthorizer: CognitoAuthorizer
-  #   Authorizers:
-  #     CognitoAuthorizer:
-  #       UserPoolArn: !Sub
-  #         - 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPoolId}'
-  #         - UserPoolId: !FindInMap [Cognito, UserPoolId, !Ref DeployEnvironment]
+  # APIs
+  InternalAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref DeployEnvironment
+    # Auth:
+    #   DefaultAuthorizer: CognitoAuthorizer
+    #   Authorizers:
+    #     CognitoAuthorizer:
+    #       UserPoolArn:
 
   # DynamoDB Tables
   BuilderTable:
