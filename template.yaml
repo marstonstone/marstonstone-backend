@@ -146,11 +146,11 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref DeployEnvironment
-    # Auth:
-    #   DefaultAuthorizer: CognitoAuthorizer
-    #   Authorizers:
-    #     CognitoAuthorizer:
-    #       UserPoolArn:
+      Auth:
+        # DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt StaffUserPool.Arn
 
   # DynamoDB Tables
   BuilderTable:
@@ -308,12 +308,13 @@ Resources:
       GenerateSecret: false
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  # HelloWorldApi:
-  #   Description: 'API Gateway endpoint URL for Prod stage for Hello World function'
-  #   Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/'
+  InternalAPI:
+    Description: 'Internal API Endpoint URL'
+    Value: !Sub
+      - 'https://${apiId}.execute-api.${AWS::Region}.amazonaws.com/${stage}/'
+      - apiId: !Ref InternalAPI
+        stage: !Ref DeployEnvironment
+
   BuilderTable:
     Description: 'DynamoDB Builder Table'
     Value: !Ref BuilderTable
