@@ -101,6 +101,46 @@ Resources:
             Path: /materials
             Method: delete
 
+  CustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub
+        - 'Customer-${env}'
+        - env: !Ref DeployEnvironment
+      CodeUri: src/functions/customer/
+      Handler: index.handler
+      Environment:
+        Variables:
+          TableName: !Ref CustomerTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CustomerTable
+      Events:
+        GetCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /customers
+            Method: get
+        PostCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /customers
+            Method: post
+        PutCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /customers
+            Method: put
+        DeleteCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /customers
+            Method: delete
+
   # APIs
   InternalAPI:
     Type: AWS::Serverless::Api

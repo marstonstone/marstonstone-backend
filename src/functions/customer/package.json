@@ -1,0 +1,8 @@
+{
+  "name": "marstonstone-customer",
+  "version": "1.0.0",
+  "description": "Marstonstone Customer Function",
+  "dependencies": {
+    "uuid": "^9.0.0"
+  }
+}
