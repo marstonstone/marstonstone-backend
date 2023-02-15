@@ -36,7 +36,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref SupplierTable
       Events:
-        GetAllSuppliers:
+        GetSupplier:
           Type: Api
           Properties:
             RestApiId: !Ref InternalAPI
@@ -59,6 +59,46 @@ Resources:
           Properties:
             RestApiId: !Ref InternalAPI
             Path: /suppliers
+            Method: delete
+
+  MaterialFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub
+        - 'Material-${env}'
+        - env: !Ref DeployEnvironment
+      CodeUri: src/functions/material/
+      Handler: index.handler
+      Environment:
+        Variables:
+          TableName: !Ref MaterialTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MaterialTable
+      Events:
+        GetMaterial:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /materials
+            Method: get
+        PostMaterial:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /materials
+            Method: post
+        PutMaterial:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /materials
+            Method: put
+        DeleteMaterial:
+          Type: Api
+          Properties:
+            RestApiId: !Ref InternalAPI
+            Path: /materials
             Method: delete
 
   # APIs
@@ -192,7 +232,7 @@ Resources:
         ReadCapacityUnits: 10
         WriteCapacityUnits: 10
       GlobalSecondaryIndexes:
-        - IndexName: builder-staff
+        - IndexName: supplier
           KeySchema:
             - AttributeName: supplier
               KeyType: HASH
